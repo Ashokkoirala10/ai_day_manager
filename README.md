@@ -1,40 +1,66 @@
 AI Day Manager - MySQL Setup (Branch: sonu)
-Setup Steps
+This branch uses MySQL instead of SQLite.
+
+🚀 Setup Steps
 1. Clone and Switch Branch
-bashgit clone <repository-url>
-cd ai_day_manager
-git checkout sonu
-2. Start MySQL
-bashdocker-compose up -d
-3. Create .env File
-bashtouch .env
-Add:
-envDB_ENGINE=mysql
+```
+   git clone <repository-url>
+    cd ai_day_manager
+    git checkout sonu
+```
+3. Start MySQL Container
+```
+docker-compose up -d
+```
+4. Create .env File
+```
+touch .env
+```
+Add the following configuration:
+env
+```
+DB_ENGINE=mysql
 DB_NAME=planner_db
 DB_USER=root
 DB_PASSWORD=root@pass
 DB_HOST=127.0.0.1
 DB_PORT=3306
-4. Install Dependencies
-bashpip install -r requirements.txt
+```
+6. Install Dependencies
+``` 
+pip install -r requirements.txt
 pip install mysqlclient python-dotenv
-5. Run Migrations
-bashpython manage.py makemigrations
+```
+8. Run Migrations
+
+```
+python manage.py makemigrations
 python manage.py migrate
-6. Run Server
-bashpython manage.py runserver
+```
+10. Start Development Server
+```
+python manage.py runserver
+```
 Open: http://127.0.0.1:8000
 
-Team Workflow
-bashgit checkout sonu
-git pull origin sonu
-docker-compose up -d
-# Create .env if missing
-python manage.py migrate
-python manage.py runserver
 
-Troubleshooting
-If port 3306 is in use: Change port in docker-compose.yml and .env
-If mysqlclient fails: Install pymysql instead and add to settings.py:
+
+⚠️ Troubleshooting
+Port 3306 already in use:
+Change port in docker-compose.yml and .env file
+mysqlclient installation fails:
+Install PyMySQL instead:
+```
+pip install pymysql
+```
+Add to settings.py
+```
 pythonimport pymysql
-pymysql.install_as_MySQLdb()Claude can make mistakes. Please double-check responses. Sonnet 4.5
+pymysql.install_as_MySQLdb()
+```
+
+📝 Notes
+
+Do NOT commit .env file
+Keep Docker container running while developing
+Always run migrations after pulling database changes
