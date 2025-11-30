@@ -1,77 +1,259 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>AI Routine Manager</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-  </head>
-  <body>
-    <div class="container">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard - AI Routine Manager</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
 
-      <!-- AI Assistant Section -->
-      <div class="assistant">
-        <h2>🤖 Hey, I'm Ashok AI</h2>
-        <div id="chatBox">
-          <div class="message bot">
-            Hey there! How can I help you plan your day today?
+<!-- Header -->
+<header class="app-header">
+  <div class="container">
+    <div class="header-content">
+      <div class="logo">
+        <i class="fas fa-brain"></i>
+        <span>AI Routine Manager</span>
+      </div>
+      <div class="user-info">
+        <span class="welcome-text">Welcome, <strong>{{ request.user.first_name|default:request.user.username }}</strong></span>
+        <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container my-4">
+  <div class="row g-4">
+    
+    <!-- Chat Assistant -->
+    <div class="col-lg-6">
+      <div class="card chat-card">
+        <div class="card-header">
+          <i class="fas fa-robot"></i>
+          <span>AI Assistant</span>
+          <button class="btn btn-sm btn-light ms-auto" id="clearChatBtn" title="Clear Chat">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <div class="card-body p-0">
+          <div id="chatBox">
+            <div class="chat-welcome">
+              <i class="fas fa-comments"></i>
+              <p>Hi! I'm your AI assistant. How can I help you today?</p>
+            </div>
           </div>
         </div>
-
-        <div class="chat-input">
-          <input type="text" id="userInput" placeholder="Ask me anything..." />
-          <button onclick="sendMessage()">Send</button>
-          <button onclick="startVoiceChat()">🎤</button>
+        <div class="card-footer">
+          <div class="chat-input-wrapper">
+            <input 
+              type="text" 
+              id="userInput" 
+              class="form-control" 
+              placeholder="Type your message..." 
+              onkeypress="if(event.key === 'Enter') sendMessage()"
+            />
+            <button class="btn btn-primary" onclick="sendMessage()" title="Send Message">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+            <button class="btn btn-secondary" onclick="startVoiceChat()" title="Voice Input">
+              <i class="fas fa-microphone"></i>
+            </button>
+          </div>
         </div>
       </div>
-
-      <!-- Routine Form -->
-      <h1>🧠 Ashok's AI Routine Manager</h1>
-
-    <form method="POST" action="{% url 'add_routine' %}" id="routineForm">
-        {% csrf_token %}
-        <input
-            type="text"
-            id="taskInput"
-            name="title"
-            placeholder="Enter task..."
-            required
-        />
-
-        <input type="time" id="timeInput" name="time" required />
-
-        <!-- Repeat type selector -->
-        <select name="repeat_type" required>
-            <option value="daily">Daily</option>
-            <option value="once">Once</option>
-            <option value="weekly">Weekly</option>
-        </select>
-
-        <div class="buttons">
-            <button type="submit">Add Routine</button>
-            <button type="button" onclick="startListening()">🎤 Speak Task</button>
-            <button type="button" onclick="startScheduler()">▶️ Start Scheduler</button>
-            <button type="button" onclick="stopScheduler()">🛑 Stop Scheduler</button>
-        </div>
-        </form>
-
-
-      <!-- Today's Routines -->
-      <h2>Today's Routines</h2>
-
-      <ul>
-        {% for r in routines %}
-        <li>
-          <b>{{ r.time }}</b> → {{ r.title }}
-          <a href="{% url 'delete_routine' r.id %}" class="delete"> ❌</a>
-        </li>
-        {% endfor %}
-      </ul>
-
-      <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
-
     </div>
 
-    <script src="{% static 'main.js' %}"></script>
-  </body>
+    <!-- Routine Manager -->
+    <div class="col-lg-6">
+      <div class="card routine-card">
+        <div class="card-header">
+          <i class="fas fa-calendar-check"></i>
+          <span>Your Routines</span>
+        </div>
+        <div class="card-body">
+          
+          <!-- Add Routine Form -->
+          <div class="routine-form-wrapper">
+            <form method="POST" action="{% url 'add_routine' %}" id="routineForm">
+              {% csrf_token %}
+              
+              <div class="form-group mb-3">
+                <label class="form-label">
+                  <i class="fas fa-tasks"></i> Task Name
+                </label>
+                <div class="input-with-icon">
+                  <input 
+                    type="text" 
+                    id="taskInput" 
+                    name="title" 
+                    class="form-control" 
+                    placeholder="Enter your task..." 
+                    required 
+                  />
+                  <button 
+                    type="button" 
+                    class="icon-btn" 
+                    onclick="startListening()" 
+                    title="Voice Input"
+                  >
+                    <i class="fas fa-microphone"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">
+                    <i class="fas fa-clock"></i> Time
+                  </label>
+                  <input 
+                    type="time" 
+                    id="timeInput" 
+                    name="time" 
+                    class="form-control" 
+                    required 
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">
+                    <i class="fas fa-repeat"></i> Repeat
+                  </label>
+                  <select name="repeat_type" class="form-select" required>
+                    <option value="daily">Daily</option>
+                    <option value="once">Once</option>
+                    <option value="weekly">Weekly</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-success">
+                  <i class="fas fa-plus"></i> Add Routine
+                </button>
+                <button type="button" class="btn btn-info" onclick="startScheduler()">
+                  <i class="fas fa-play"></i> Start
+                </button>
+                <button type="button" class="btn btn-warning" onclick="stopScheduler()">
+                  <i class="fas fa-stop"></i> Stop
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Routines List -->
+          <div class="routines-list mt-4">
+            <div class="list-header">
+              <h5>
+                <i class="fas fa-list-check"></i> Today's Routines
+                <span class="badge">{{ routines|length }}</span>
+              </h5>
+            </div>
+            
+            {% if routines %}
+              <ul class="list-group">
+                {% for r in routines %}
+                <li class="list-group-item">
+                  <div class="routine-item">
+                    <div class="routine-info">
+                      <span class="routine-time">
+                        <i class="fas fa-clock"></i>
+                        {{ r.time }}
+                      </span>
+                      <span class="routine-title">{{ r.title }}</span>
+                      <span class="routine-badge badge-{{ r.repeat_type }}">
+                        {{ r.repeat_type }}
+                      </span>
+                    </div>
+                    <div class="routine-actions">
+                      <a href="{% url 'delete_routine' r.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </div>
+                </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <div class="empty-state">
+                <i class="fas fa-calendar-plus"></i>
+                <p>No routines yet. Add your first routine above!</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="row g-4 mt-2">
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-calendar-day"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ routines|length }}</h3>
+          <p>Today's Tasks</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+          <h3>0</h3>
+          <p>Completed</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-fire"></i>
+        </div>
+        <div class="stat-content">
+          <h3>1</h3>
+          <p>Day Streak</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'main.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Clear chat functionality
+  document.getElementById('clearChatBtn').addEventListener('click', function() {
+    const chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML = `
+      <div class="chat-welcome">
+        <i class="fas fa-comments"></i>
+        <p>Chat cleared! How can I help you?</p>
+      </div>
+    `;
+  });
+
+  // Auto-scroll chat to bottom
+  function scrollChatToBottom() {
+    const chatBox = document.getElementById('chatBox');
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  // Call after adding messages
+  window.addEventListener('load', scrollChatToBottom);
+</script>
+
+</body>
 </html>

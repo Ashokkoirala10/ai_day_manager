@@ -63,9 +63,18 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
+@login_required
 def chat_ai(request):
     data = json.loads(request.body)
     user_msg = data.get("message", "")
+
+    # Initialize session chat if not exists
+    if "chat_history" not in request.session:
+        request.session["chat_history"] = []
+
+    # Save user message
+    request.session["chat_history"].append({"sender": "user", "message": user_msg})
+    request.session.modified = True
 
     prompt = f"""
     You are Ashok AI, a friendly day management assistant.
@@ -88,12 +97,30 @@ def chat_ai(request):
                 token = obj.get("response", "") or obj.get("message", "")
                 full_text += token
 
+        # Save bot response in session
+        request.session["chat_history"].append({"sender": "bot", "message": full_text})
+        request.session.modified = True
+
         return JsonResponse({"response": full_text})
 
     except Exception as e:
+        err_msg = "⚠️ Failed to connect to local AI."
+        request.session["chat_history"].append({"sender": "bot", "message": err_msg})
+        request.session.modified = True
         print("Chat Error:", e)
-        return JsonResponse({"response": "⚠️ Failed to connect to local AI."}, status=500)
+        return JsonResponse({"response": err_msg}, status=500)
 
+
+@login_required
+def chat_history(request):
+    history = request.session.get("chat_history", [])
+    return JsonResponse({"history": history})
+
+@login_required
+def chat_clear(request):
+    request.session["chat_history"] = []
+    request.session.modified = True
+    return JsonResponse({"status": "cleared"})
 
 
 # 🔹 Start/stop scheduler

@@ -16,8 +16,12 @@ urlpatterns = [
 
     path("scheduler/start/", views.scheduler_start, name="start_scheduler"),
     path("scheduler/stop/", views.scheduler_stop, name="stop_scheduler"),
+    path("scheduler/check/", views.scheduler_check, name="check_scheduler"),
     path("register/", views.register_view, name="register"),
-    
+    path("chat/history/", views.chat_history, name="chat_history"),
+    path("chat/clear/", views.chat_clear, name="chat_clear"),
+
+
 
 
 ]
