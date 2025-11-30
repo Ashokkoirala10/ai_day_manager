@@ -1,0 +1,163 @@
+/* --- General Body --- */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f5f6fa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* --- Main Container --- */
+.container {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* --- Headings --- */
+h1, h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* --- Inputs & Buttons --- */
+input[type="text"], input[type="time"], button {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+button {
+  background-color: #6c63ff;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #5a54d1;
+}
+
+.buttons button {
+  margin-right: 5px;
+}
+
+/* --- Assistant Panel --- */
+.assistant {
+  width: 300px;
+  background: #f8f9fa;
+  border-left: 2px solid #ddd;
+  padding: 15px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: -4px 0 10px rgba(0,0,0,0.05);
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.assistant h2 {
+  margin-top: 0;
+}
+
+/* --- Chat Box --- */
+#chatBox {
+  flex: 1;
+  overflow-y: auto;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.message {
+  margin: 8px 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.message.user {
+  background: #007bff;
+  color: white;
+  text-align: right;
+  margin-left: auto;
+}
+
+.message.bot {
+  background: #e9ecef;
+  color: #333;
+  text-align: left;
+}
+
+/* --- Chat Input --- */
+.chat-input {
+  display: flex;
+  gap: 6px;
+}
+
+/* --- Routine List --- */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+ul li {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  background: #f9f9f9;
+}
+
+/* --- Routine Form --- */
+#routineForm {
+  margin-bottom: 20px;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .assistant {
+    width: 100%;
+    height: 250px;
+    position: relative;
+    border-left: none;
+    border-top: 2px solid #ddd;
+  }
+  
+  body {
+    flex-direction: column;
+  }
+  
+  .container {
+    padding: 20px;
+  }
+}
+.logout-btn {
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  background: #ff4d4d;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s ease;
+  z-index: 999;
+}
+
+.logout-btn:hover {
+  background: #d93636;
+}

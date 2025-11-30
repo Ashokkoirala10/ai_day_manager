@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI Routine Manager</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+  </head>
+  <body>
+    <div class="container">
+
+      <!-- AI Assistant Section -->
+      <div class="assistant">
+        <h2>🤖 Hey, I'm Ashok AI</h2>
+        <div id="chatBox">
+          <div class="message bot">
+            Hey there! How can I help you plan your day today?
+          </div>
+        </div>
+
+        <div class="chat-input">
+          <input type="text" id="userInput" placeholder="Ask me anything..." />
+          <button onclick="sendMessage()">Send</button>
+          <button onclick="startVoiceChat()">🎤</button>
+        </div>
+      </div>
+
+      <!-- Routine Form -->
+      <h1>🧠 Ashok's AI Routine Manager</h1>
+
+    <form method="POST" action="{% url 'add_routine' %}" id="routineForm">
+        {% csrf_token %}
+        <input
+            type="text"
+            id="taskInput"
+            name="title"
+            placeholder="Enter task..."
+            required
+        />
+
+        <input type="time" id="timeInput" name="time" required />
+
+        <!-- Repeat type selector -->
+        <select name="repeat_type" required>
+            <option value="daily">Daily</option>
+            <option value="once">Once</option>
+            <option value="weekly">Weekly</option>
+        </select>
+
+        <div class="buttons">
+            <button type="submit">Add Routine</button>
+            <button type="button" onclick="startListening()">🎤 Speak Task</button>
+            <button type="button" onclick="startScheduler()">▶️ Start Scheduler</button>
+            <button type="button" onclick="stopScheduler()">🛑 Stop Scheduler</button>
+        </div>
+        </form>
+
+
+      <!-- Today's Routines -->
+      <h2>Today's Routines</h2>
+
+      <ul>
+        {% for r in routines %}
+        <li>
+          <b>{{ r.time }}</b> → {{ r.title }}
+          <a href="{% url 'delete_routine' r.id %}" class="delete"> ❌</a>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+
+    </div>
+
+    <script src="{% static 'main.js' %}"></script>
+  </body>
+</html>
