@@ -18,18 +18,39 @@ function sendMessage() {
     appendMessage(text, "user");
     input.value = "";
 
-    fetch("/chat/", {   // FIXED
+    fetch("/chat/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text }),
     })
-      .then(res => res.json())        // FIXED
-      .then(data => appendMessage(data.response, "bot")) // FIXED
+      .then(res => res.json())
+      .then(data => appendMessage(data.response, "bot"))
       .catch(err => appendMessage("⚠️ Error: " + err, "bot"));
 }
 
+// --- Load session chat history on page load ---
+window.addEventListener("load", () => {
+    fetch("/chat/history/")
+    .then(res => res.json())
+    .then(data => {
+        if (data.history.length === 0) {
+            appendMessage("Hey there! How can I help you plan your day today?", "bot");
+        } else {
+            data.history.forEach(msg => appendMessage(msg.message, msg.sender));
+        }
+    });
 
-// Voice chat
+    // Clear chat button
+    document.getElementById("clearChatBtn")?.addEventListener("click", () => {
+        fetch("/chat/clear/")
+        .then(res => res.json())
+        .then(() => {
+            document.getElementById("chatBox").innerHTML = "";
+        });
+    });
+});
+
+// --- Voice chat ---
 function startVoiceChat() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return alert("Voice not supported");
@@ -65,7 +86,6 @@ setInterval(() => {
     });
 }, 20000);
 
-
 // --- Routine voice input ---
 function parseTime(text) {
     const numbers = {
@@ -74,11 +94,9 @@ function parseTime(text) {
         "eleven":11, "twelve":12
     };
 
-    // Replace word numbers with digits
     text = text.replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/gi, 
         m => numbers[m.toLowerCase()]);
 
-    // Now match HH MM am/pm
     const match = text.match(/(\d{1,2})[:\s](\d{1,2})\s?(am|pm)/i);
     if (!match) return null;
 
@@ -92,9 +110,6 @@ function parseTime(text) {
     return hour.toString().padStart(2,"0") + ":" + minute.toString().padStart(2,"0");
 }
 
-
-
-
 function startListening() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return alert("Voice not supported");
@@ -104,10 +119,8 @@ function startListening() {
 
     rec.onresult = e => {
         const text = e.results[0][0].transcript;
-
         const time = parseTime(text);
         if (time) document.getElementById("timeInput").value = time;
-
         document.getElementById("taskInput").value = text;
         document.getElementById("routineForm").submit();
     };
@@ -127,4 +140,3 @@ function stopScheduler() {
         .then(res => res.json())
         .then(() => alert("Scheduler STOPPED"));
 }
-
