@@ -68,19 +68,31 @@ setInterval(() => {
 
 // --- Routine voice input ---
 function parseTime(text) {
-  // Match 6 4 pm or 6:04 pm
-  const match = text.match(/(\d{1,2})[:\s](\d{1,2})\s?(am|pm)/i);
-  if (!match) return null;
+    const numbers = {
+        "zero":0, "one":1, "two":2, "three":3, "four":4, "five":5,
+        "six":6, "seven":7, "eight":8, "nine":9, "ten":10,
+        "eleven":11, "twelve":12
+    };
 
-  let hour = parseInt(match[1]);
-  let minute = parseInt(match[2]);
-  const period = match[3].toLowerCase();
+    // Replace word numbers with digits
+    text = text.replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/gi, 
+        m => numbers[m.toLowerCase()]);
 
-  if (period === "pm" && hour !== 12) hour += 12;
-  if (period === "am" && hour === 12) hour = 0;
+    // Now match HH MM am/pm
+    const match = text.match(/(\d{1,2})[:\s](\d{1,2})\s?(am|pm)/i);
+    if (!match) return null;
 
-  return hour.toString().padStart(2, "0") + ":" + minute.toString().padStart(2, "0");
+    let hour = parseInt(match[1]);
+    let minute = parseInt(match[2]);
+    const period = match[3].toLowerCase();
+
+    if (period === "pm" && hour !== 12) hour += 12;
+    if (period === "am" && hour === 12) hour = 0;
+
+    return hour.toString().padStart(2,"0") + ":" + minute.toString().padStart(2,"0");
 }
+
+
 
 
 function startListening() {
