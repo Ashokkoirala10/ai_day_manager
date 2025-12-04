@@ -1,23 +1,31 @@
 from django.contrib import admin
 from django.urls import path
 from manager import views
+from rest_framework_simplejwt.views import TokenRefreshView
+from manager.views import (
+    RegisterView,
+    LoginView,
+    LogoutView,
+    UserProfileView,
+    RoutineListCreateView,
+    RoutineDetailView,
+    ChatView,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-
-    path("", views.dashboard, name="dashboard"),
-    path("login/", views.login_view, name="login"),
-    path("logout/", views.logout_view, name="logout"),
-
-    path("add/", views.add_routine, name="add_routine"),
-    path("delete/<int:id>/", views.delete_routine, name="delete_routine"),
-
-    path("chat/", views.chat_ai, name="chat_ai"),
-
-    path("scheduler/start/", views.scheduler_start, name="start_scheduler"),
-    path("scheduler/stop/", views.scheduler_stop, name="stop_scheduler"),
-    path("register/", views.register_view, name="register"),
     
+    # Authentication - Add 'api/' prefix
+    path('auth/register/', RegisterView.as_view(), name='register'),
+    path('auth/login/', LoginView.as_view(), name='login'),
+    path('auth/logout/', LogoutView.as_view(), name='logout'),
+    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/profile/', UserProfileView.as_view(), name='profile'),
+    
+    # Routines - Add 'api/' prefix
+    path('routines/', RoutineListCreateView.as_view(), name='routine-list-create'),
+    path('routines/<int:pk>/', RoutineDetailView.as_view(), name='routine-detail'),
 
-
+        # ==================== CHAT ====================
+    path('chat/', ChatView.as_view(), name='chat'),
 ]
